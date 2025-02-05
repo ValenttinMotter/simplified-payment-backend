@@ -20,12 +20,12 @@ public class AuthorizationService {
     @Value("${app.authorizationApi}")
     private String authApiUrl;
 
-    public boolean authorizeTransaction(User sender, BigDecimal value){
+    public boolean authorizeTransaction(User sender, BigDecimal value) throws Exception {
         ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity(this.authApiUrl, Map.class);
 
-        if(authorizationResponse.getStatusCode() == HttpStatus.OK){
-            String message = (String) authorizationResponse.getBody().get("message");
-            return "Autorizado".equalsIgnoreCase(message);
+        if(authorizationResponse.getStatusCode() == HttpStatus.OK && authorizationResponse.getBody() != null){
+            Map<String, Object> data = (Map<String, Object>) authorizationResponse.getBody().get("data");
+            return data != null && Boolean.TRUE.equals(data.get("authorization"));
         } else return false;
     }
 }
